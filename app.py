@@ -190,33 +190,33 @@ else:
 
     # --- Sidebar ---
     with st.sidebar:
-    # Nom + bouton sur la même ligne
-    col_name, col_btn = st.columns([0.78, 0.22])
-    with col_name:
-        st.markdown(f"### 👤 {st.session_state.prenom}")
-    with col_btn:
-        st.markdown("<div style='padding-top:16px'>", unsafe_allow_html=True)
-        if st.button("🔄", help="Changer d'utilisateur", key="change_user"):
-            st.session_state.user_selected        = False
-            st.session_state.messages_display     = []
-            st.session_state.assessment_triggered = False
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Nom + bouton sur la même ligne
+        col_name, col_btn = st.columns([0.78, 0.22])
+        with col_name:
+            st.markdown(f"### 👤 {st.session_state.prenom}")
+        with col_btn:
+            st.markdown("<div style='padding-top:16px'>", unsafe_allow_html=True)
+            if st.button("🔄", help="Changer d'utilisateur", key="change_user"):
+                st.session_state.user_selected        = False
+                st.session_state.messages_display     = []
+                st.session_state.assessment_triggered = False
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
+        st.markdown("---")
 
-    # Agents (non cliquables)
-    st.markdown("**Agents disponibles**")
-    for label in AGENT_LABELS.values():
-        st.markdown(f'<div class="agent-tag">{label}</div>', unsafe_allow_html=True)
+        # Agents (non cliquables)
+        st.markdown("**Agents disponibles**")
+        for label in AGENT_LABELS.values():
+            st.markdown(f'<div class="agent-tag">{label}</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+        st.markdown("---")
 
-    # Infos de suivi
-    st.markdown("**📊 Votre suivi**")
-    st.caption(f"🗂 Assessment : {assessment_status}")
-    st.caption(f"💬 Sessions : {session_count}")
-    st.caption(f"📝 Messages échangés : {nb_messages}")
+        # Infos de suivi
+        st.markdown("**📊 Votre suivi**")
+        st.caption(f"🗂 Assessment : {assessment_status}")
+        st.caption(f"💬 Sessions : {session_count}")
+        st.caption(f"📝 Messages échangés : {nb_messages}")
 
 
     # --- Header ---
