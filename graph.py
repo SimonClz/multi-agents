@@ -1,10 +1,9 @@
+import os
 from typing import TypedDict, Annotated, List
 import operator
-import sqlite3
 
 from langchain_core.messages import BaseMessage
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.sqlite import SqliteSaver
 
 from agents import (
     agent_orchestrateur,
@@ -16,26 +15,38 @@ from agents import (
 )
 
 # ============================================================
-# ÉTAT PARTAGÉ — 2 nouveaux champs ajoutés
+# ÉTAT PARTAGÉ
 # ============================================================
 class AgentState(TypedDict):
     messages: Annotated[List[BaseMessage], operator.add]
     next_agent: str
     session_count: int
-    assessment_done: bool  # ← NOUVEAU : assessment complété ?
-    user_profile: str      # ← NOUVEAU : profil issu de l'assessment
-    domain_notes: dict     # ← NOUVEAU : mémoire structurée par domaine
-    last_agent: str    # ← NOUVEAU : pour afficher l'agent dans l'UI
+    assessment_done: bool
+    user_profile: str
+    domain_notes: dict
+    last_agent: str
 
 # ============================================================
-# ROUTING — Force l'assessment si pas encore fait
+# ROUTING
 # ============================================================
 def routing(state: AgentState) -> str:
-    # Si l'assessment n'est PAS encore complété → toujours assessment
     if not state.get("assessment_done", False):
         return "assessment"
-    # Sinon → décision de l'orchestrateur
     return state["next_agent"]
+
+# ============================================================
+# RÉCUPÉRATION DE L'URL BASE DE DONNÉES
+# ============================================================
+def get_database_url():
+    """Lit l'URL PostgreSQL depuis .env (local) ou Streamlit secrets (cloud)."""
+    db_url = os.environ.get("DATABASE_URL", "")
+    if not db_url:
+        try:
+            import streamlit as st
+            db_url = st.secrets.get("DATABASE_URL", "")
+        except Exception:
+            pass
+    return db_url
 
 # ============================================================
 # CONSTRUCTION DU GRAPHE
@@ -70,7 +81,23 @@ def create_graph():
     graph.add_edge("education",  END)
     graph.add_edge("synthese",   END)
 
-    conn = sqlite3.connect("conversations.db", check_same_thread=False)
-    memory = SqliteSaver(conn)
+    # -------------------------------------------------------
+    # CHECKPOINTER : PostgreSQL (cloud) ou SQLite (local)
+    # -------------------------------------------------------
+    db_url = get_database_url()
+
+    if db_url:
+        # ✅ Cloud : PostgreSQL Supabase (données permanentes)
+        from langgraph.checkpoint.postgres import PostgresSaver
+        memory = PostgresSaver.from_conn_string(db_url)
+        memory.setup()  # Crée les tables si elles n'existent pas
+        print("✅ Connexion PostgreSQL (Supabase) établie")
+    else:
+        # 🔄 Local : SQLite (fallback)
+        import sqlite3
+        from langgraph.checkpoint.sqlite import SqliteSaver
+        conn = sqlite3.connect("conversations.db", check_same_thread=False)
+        memory = SqliteSaver(conn)
+        print("🔄 Connexion SQLite locale")
 
     return graph.compile(checkpointer=memory)
