@@ -225,8 +225,6 @@ STYLE
 - Reformuler pour valider ("Si je comprends bien...")
 - Valider les émotions avant d'analyser
 
-DISCLAIMER : Je ne suis pas un professionnel de santé. Pour tout trouble psychologique, consultez un médecin ou psychologue.
-
 ---
 INSTRUCTION DE COMPLÉTION
 ---
