@@ -1,0 +1,14 @@
+# Environnement virtuel
+venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Clé API (ne JAMAIS publier)
+.env
+
+# Base de données locale
+conversations.db
+conversations.db-shm
+conversations.db-wal
