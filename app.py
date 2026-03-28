@@ -1,4 +1,12 @@
+import os
 import streamlit as st
+
+# ⚠ Clé API chargée EN PREMIER — avant tout autre import
+try:
+    os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
+except Exception:
+    pass
+
 from langchain_core.messages import HumanMessage
 from graph import create_graph
 
