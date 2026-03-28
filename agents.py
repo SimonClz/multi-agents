@@ -385,11 +385,41 @@ def agent_assessment(state):
     response_propre = response.content
 
     if assessment_done:
+        # Extraire le profil technique (pour les autres agents)
         parties = response.content.split(MARQUEUR_PROFIL, 1)
         response_propre = parties[0].strip()
         if len(parties) > 1:
             user_profile = parties[1].strip()
-        print("\n✅ Assessment complété — Profil établi sur 6 dimensions !\n")
+
+        # Générer un récap lisible et chaleureux pour l'utilisateur
+        recap_response = get_llm().invoke([HumanMessage(content=f"""
+Sur la base de cet assessment psychologique complet :
+
+{user_profile}
+
+Rédige un récapitulatif structuré et bienveillant pour présenter ce profil à l'utilisateur.
+
+Le message doit :
+1. Commencer par confirmer chaleureusement la fin de l'assessment
+2. Présenter les grandes lignes du profil en langage accessible (évite le jargon)
+3. Mettre en valeur 3-4 forces psychologiques identifiées
+4. Mentionner 2-3 axes de développement avec bienveillance
+5. Faire un bref point sur la dynamique familiale/couple si mentionnée
+6. Conclure en invitant à explorer n'importe quel sujet
+
+Style : chaleureux, encourageant, structuré avec des sections claires et des emojis.
+Longueur : 250 à 750 mots.
+""")])
+
+        # Combiner message de clôture + récap structuré
+        response_propre = (
+            response_propre +
+            "\n\n---\n\n" +
+            "## 🎯 Votre profil en résumé\n\n" +
+            recap_response.content
+        )
+
+        print("\n✅ Assessment complété — Profil établi et récap généré !\n")
 
     message_clean = AIMessage(content=response_propre)
 
