@@ -221,7 +221,7 @@ else:
 
 
     # --- Header ---
-    st.markdown(f"## 🪴 Bonjour {st.session_state.prenom} !")
+    st.markdown(f"## 🪴 Bonjour {st.session_state.prenom}")
 
     # --- Auto-trigger assessment nouveaux utilisateurs ---
     if not st.session_state.assessment_triggered:
@@ -267,7 +267,7 @@ else:
             with st.chat_message("user", avatar="👤"):
                 st.write(msg["content"])
         else:
-            with st.chat_message("assistant", avatar="🪴"):
+            with st.chat_message("assistant"):
                 agent = msg.get("agent", "")
                 label = AGENT_LABELS.get(agent, "🪴 Assistant")
                 st.caption(f"*Agent actif : {label}*")
@@ -284,7 +284,7 @@ else:
             "content": user_input
         })
 
-        with st.chat_message("assistant", avatar="🪴"):
+        with st.chat_message("assistant"):
             with st.spinner("⏳ Traitement en cours..."):
                 try:
                     result = graph.invoke(
