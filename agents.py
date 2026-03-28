@@ -177,10 +177,14 @@ EXERCICES POSSIBLES :
 
 Style : coach analytique, neutre, bienveillant, structuré.
 
-INSTRUCTION MÉMOIRE SYSTÈME (invisible pour l'utilisateur) :
-À la toute fin de ta réponse, ajoute sur une nouvelle ligne :
-[NOTE_PSY:] [2-3 observations clés séparées par |]
-Exemple : [NOTE_PSY:] schéma d'évitement émotionnel | progrès sur la communication | stress professionnel élevé"""
+INSTRUCTION MÉMOIRE SYSTÈME (non visible par l'utilisateur) :
+À la toute fin de ta réponse, ajoute cette balise avec une note structurée :
+[NOTE_PSY:]
+OBSERVATIONS: [schémas, mécanismes, émotions clés identifiés]
+LIEN_COUPLE: [impact sur la relation de couple si pertinent]
+LIEN_PARENTAL: [impact sur la parentalité si pertinent]
+ÉVOLUTION: [progrès ou régression par rapport aux sessions précédentes]
+PRIORITÉ: [point le plus important à travailler]"""
 
 
 PROMPT_COUPLE = """Tu es un agent spécialisé dans l'analyse des dynamiques de couple.
@@ -211,10 +215,14 @@ RÈGLES :
 
 Style : analytique, neutre, équilibré, pragmatique.
 
-INSTRUCTION MÉMOIRE SYSTÈME (invisible pour l'utilisateur) :
-À la toute fin de ta réponse, ajoute sur une nouvelle ligne :
-[NOTE_COUPLE:] [2-3 observations clés séparées par |]
-Exemple : [NOTE_COUPLE:] conflit récurrent sur l'organisation | amélioration écoute active | besoin de reconnaissance non exprimé"""
+INSTRUCTION MÉMOIRE SYSTÈME (non visible par l'utilisateur) :
+À la toute fin de ta réponse, ajoute cette balise avec une note structurée :
+[NOTE_COUPLE:]
+OBSERVATIONS: [dynamiques, schémas relationnels, tensions identifiées]
+LIEN_PSY: [connexion avec le profil psychologique individuel]
+LIEN_PARENTAL: [impact sur la parentalité si pertinent]
+ÉVOLUTION: [progrès ou tensions nouvelles par rapport aux sessions précédentes]
+PRIORITÉ: [axe relationnel le plus urgent à travailler]"""
 
 PROMPT_EDUCATION = """Tu es un agent spécialisé dans l'éducation et le développement des enfants.
 
@@ -242,10 +250,14 @@ SORTIE :
 
 Style : clair, structuré, pragmatique, neutre.
 
-INSTRUCTION MÉMOIRE SYSTÈME (invisible pour l'utilisateur) :
-À la toute fin de ta réponse, ajoute sur une nouvelle ligne :
-[NOTE_EDUCATION:] [2-3 observations clés séparées par |]
-Exemple : [NOTE_EDUCATION:] enfant de 7 ans avec crises émotionnelles | parent tend à surprotéger | progrès sur la discipline positive"""
+INSTRUCTION MÉMOIRE SYSTÈME (non visible par l'utilisateur) :
+À la toute fin de ta réponse, ajoute cette balise avec une note structurée :
+[NOTE_EDUCATION:]
+OBSERVATIONS: [comportements enfants, défis parentaux, approches testées]
+LIEN_PSY: [connexion avec le profil psychologique du parent]
+LIEN_COUPLE: [impact de la dynamique de couple sur la parentalité]
+ÉVOLUTION: [progrès ou difficultés nouvelles]
+PRIORITÉ: [défi éducatif le plus pressant]"""
 
 PROMPT_SYNTHESE = """Tu es l'agent de synthèse et d'évolution.
 
@@ -273,10 +285,13 @@ ANALYSE :
 
 Style : analytique, synthétique, rigoureux, scientifique.
 
-INSTRUCTION MÉMOIRE SYSTÈME (invisible pour l'utilisateur) :
-À la toute fin de ta réponse, ajoute sur une nouvelle ligne :
-[NOTE_SYNTHESE:] [2-3 observations clés séparées par |]
-Exemple : [NOTE_SYNTHESE:] évolution positive sur 3 mois | axe prioritaire : couple | risque burnout à surveiller"""
+INSTRUCTION MÉMOIRE SYSTÈME (non visible par l'utilisateur) :
+À la toute fin de ta réponse, ajoute cette balise avec une note structurée :
+[NOTE_SYNTHESE:]
+OBSERVATIONS: [tendances globales, cohérences et contradictions entre domaines]
+PROGRÈS: [évolutions positives identifiées]
+RISQUES: [signaux d'alerte à surveiller]
+PRIORITÉ: [axe de travail prioritaire pour les prochaines semaines]"""
 
 # ============================================================
 # MARQUEURS
@@ -294,11 +309,14 @@ MARQUEURS_NOTES = {
 # ============================================================
 
 def extraire_note(contenu: str, marqueur: str) -> tuple:
-    """Sépare la réponse principale de la note mémoire."""
+    """Sépare la réponse principale de la note mémoire structurée."""
     if marqueur in contenu:
         parties = contenu.split(marqueur, 1)
         response_propre = parties[0].strip()
+        # Capturer tout jusqu'à la fin du message comme note
         note = parties[1].strip() if len(parties) > 1 else ""
+        # Nettoyer les éventuelles lignes vides en fin de note
+        note = note.strip()
         return response_propre, note
     return contenu, ""
 
@@ -310,7 +328,7 @@ def mettre_a_jour_notes(state: dict, domaine: str, note: str) -> dict:
     return notes
 
 def construire_contexte(prompt_base: str, state: dict) -> str:
-    """Enrichit le prompt avec le profil ET les notes des conversations passées."""
+    """Enrichit le prompt avec le profil ET les insights croisés entre agents."""
     user_profile = state.get("user_profile", "")
     domain_notes = state.get("domain_notes", {})
 
@@ -324,25 +342,37 @@ def construire_contexte(prompt_base: str, state: dict) -> str:
 📋 PROFIL PSYCHOLOGIQUE COMPLET DE L'UTILISATEUR :
 {user_profile}
 
-INSTRUCTION : Adapte TOUTES tes réponses à ce profil.
-Tiens compte du style d'attachement, des mécanismes émotionnels,
-des biais cognitifs, de l'écosystème familial et des forces identifiées.
+Ce profil est ta base de référence. Adapte TOUTES tes réponses à cette personnalité spécifique.
 ---"""
 
-    # Injection des notes de conversations passées
-    if domain_notes:
-        contexte += "\n\n📝 MÉMOIRE DES CONVERSATIONS PASSÉES :"
+    # Injection de la mémoire inter-agents
+    if any(domain_notes.values()):
         labels = {
-            "psy":       "Suivi psychologique",
-            "couple":    "Dynamique de couple",
-            "education": "Éducation & enfants",
-            "synthese":  "Synthèse globale"
+            "psy":       "🧠 Suivi Psychologique",
+            "couple":    "💑 Couple",
+            "education": "👶 Éducation & Enfants",
+            "synthese":  "📊 Synthèse Globale"
         }
+
+        contexte += "\n\n🔗 MÉMOIRE INTER-AGENTS — Insights des sessions précédentes :\n"
+
         for domaine, note in domain_notes.items():
             if note:
                 label = labels.get(domaine, domaine)
-                contexte += f"\n• {label} : {note}"
-        contexte += "\n\nINSTRUCTION : Utilise ces observations pour assurer la continuité et personnaliser ta réponse."
+                contexte += f"\n• {label} :\n{note}\n"
+
+        contexte += """
+---
+⚠ INSTRUCTION TRANSVERSALE OBLIGATOIRE :
+Ces insights des autres agents sont essentiels à ta réponse.
+Tu DOIS faire des liens EXPLICITES entre les domaines dans ton analyse.
+
+Exemples de connexions à établir :
+- Si l'agent psy note de l'anxiété → l'agent couple doit explorer comment elle affecte la relation
+- Si l'agent couple note des conflits → l'agent psy doit analyser les mécanismes sous-jacents
+- Si l'agent éducation note du stress parental → les autres agents doivent en tenir compte
+- Utilise des formulations comme : "Comme évoqué lors de vos échanges sur [domaine]..."
+---"""
 
     return contexte
 
