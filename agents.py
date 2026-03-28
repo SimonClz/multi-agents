@@ -16,7 +16,14 @@ except Exception:
 # ============================================================
 # MODÈLE GPT PARTAGÉ PAR TOUS LES AGENTS
 # ============================================================
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3)
+_llm_instance = None
+
+def get_llm():
+    """Crée le LLM uniquement quand nécessaire (après chargement des secrets)."""
+    global _llm_instance
+    if _llm_instance is None:
+        _llm_instance = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3)
+    return _llm_instance
 
 # ============================================================
 # PROMPTS SYSTÈME DE CHAQUE AGENT
@@ -351,7 +358,7 @@ def agent_orchestrateur(state):
     if not assessment_done:
         return {"next_agent": "assessment"}
 
-    response = llm.invoke([
+    response = get_llm().invoke([
         SystemMessage(content=PROMPT_ORCHESTRATEUR),
         HumanMessage(content=f"Message de l'utilisateur : {messages[-1].content}")
     ])
@@ -368,7 +375,7 @@ def agent_assessment(state):
     """Agent d'évaluation complète sur 6 dimensions."""
     messages = state["messages"]
 
-    response = llm.invoke([
+    response = get_llm().invoke([
         SystemMessage(content=PROMPT_ASSESSMENT),
         *messages
     ])
@@ -399,7 +406,7 @@ def agent_suivi_psy(state):
     messages = state["messages"]
     system_prompt = construire_contexte(PROMPT_SUIVI_PSY, state)
 
-    response = llm.invoke([
+    response = get_llm().invoke([
         SystemMessage(content=system_prompt),
         *messages
     ])
@@ -421,7 +428,7 @@ def agent_couple(state):
     messages = state["messages"]
     system_prompt = construire_contexte(PROMPT_COUPLE, state)
 
-    response = llm.invoke([
+    response = get_llm().invoke([
         SystemMessage(content=system_prompt),
         *messages
     ])
@@ -442,7 +449,7 @@ def agent_education(state):
     messages = state["messages"]
     system_prompt = construire_contexte(PROMPT_EDUCATION, state)
 
-    response = llm.invoke([
+    response = get_llm().invoke([
         SystemMessage(content=system_prompt),
         *messages
     ])
@@ -463,7 +470,7 @@ def agent_synthese(state):
     messages = state["messages"]
     system_prompt = construire_contexte(PROMPT_SYNTHESE, state)
 
-    response = llm.invoke([
+    response = get_llm().invoke([
         SystemMessage(content=system_prompt),
         *messages
     ])
