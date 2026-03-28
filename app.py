@@ -65,15 +65,7 @@ if not st.session_state.user_selected:
     st.markdown("<p style='text-align:center; color:gray'>Psychologie · Couple · Famille · Développement personnel</p>", unsafe_allow_html=True)
     st.markdown("---")
 
-    st.warning("""
-    **⚠ Disclaimer**  
-    Ce système est un outil d'exploration personnelle.  
-    Il ne remplace pas un professionnel de santé, psychologue, thérapeute ou médecin agréé.  
-    En cas de souffrance importante, consultez un professionnel.
-    """)
-
-    st.markdown("---")
-    st.markdown("### 👤 Qui utilise le système ?")
+    st.markdown("<h2 style='text-align:center'>👤 Qui utilise le système ?</h2>", unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
