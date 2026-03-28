@@ -88,10 +88,14 @@ def create_graph():
 
     if db_url:
         # ✅ Cloud : PostgreSQL Supabase (données permanentes)
+        import psycopg
         from langgraph.checkpoint.postgres import PostgresSaver
-        memory = PostgresSaver.from_conn_string(db_url)
-        memory.setup()  # Crée les tables si elles n'existent pas
+        
+        conn = psycopg.connect(db_url, autocommit=True)
+        memory = PostgresSaver(conn)
+        memory.setup()
         print("✅ Connexion PostgreSQL (Supabase) établie")
+        
     else:
         # 🔄 Local : SQLite (fallback)
         import sqlite3
