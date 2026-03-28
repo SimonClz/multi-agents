@@ -22,7 +22,7 @@ def get_llm():
     """Crée le LLM uniquement quand nécessaire (après chargement des secrets)."""
     global _llm_instance
     if _llm_instance is None:
-        _llm_instance = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.3)
+        _llm_instance = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.3)
     return _llm_instance
 
 # ============================================================
