@@ -255,7 +255,7 @@ else:
             <h3>Vous êtes dans votre safe space</h3>
             <p>Je suis là pour vous accompagner dans votre développement personnel,<br>
             votre vie de couple et l'éducation de vos enfants.</p>
-            <p style="margin-top: 20px">
+            <p style="margin-top: 20px; font-size: 0.9em">
                 Envoyez un premier message pour commencer votre parcours.
             </p>
         </div>
