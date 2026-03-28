@@ -27,22 +27,8 @@ COLOR_DARK = "#525A38"
 # CSS PERSONNALISÉ
 # ============================================================
 st.markdown(f"""
-
-/* --- Bouton icône sidebar (changer d'utilisateur) --- */
-[data-testid="stSidebar"] .stButton > button {{
-    width: 34px !important;
-    height: 34px !important;
-    min-height: 34px !important;
-    padding: 0 !important;
-    border-radius: 50% !important;
-    font-size: 16px !important;
-    line-height: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}}
-
 <style>
+
 /* --- Input border --- */
 .stChatInput > div {{
     border-color: {COLOR} !important;
@@ -67,6 +53,20 @@ st.markdown(f"""
     border-color: {COLOR_DARK} !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(107, 115, 72, 0.35) !important;
+}}
+
+/* --- Bouton icône sidebar --- */
+[data-testid="stSidebar"] .stButton > button {{
+    width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }}
 
 /* --- Agents sidebar (non cliquables) --- */
@@ -95,9 +95,10 @@ st.markdown(f"""
     margin-bottom: 10px;
 }}
 
-/* --- Masquer éléments Streamlit par défaut --- */
+/* --- Masquer éléments Streamlit --- */
 #MainMenu {{visibility: hidden;}}
 footer {{visibility: hidden;}}
+
 </style>
 """, unsafe_allow_html=True)
 
