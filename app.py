@@ -214,7 +214,7 @@ else:
         st.markdown("---")
 
         # Infos de suivi
-        st.markdown("**📊 Votre suivi**")
+        st.markdown("**Votre suivi**")
         st.caption(f"🗂 Assessment : {assessment_status}")
         st.caption(f"💬 Sessions : {session_count}")
         st.caption(f"📝 Messages échangés : {nb_messages}")
@@ -267,7 +267,7 @@ else:
             with st.chat_message("user", avatar="👤"):
                 st.write(msg["content"])
         else:
-            with st.chat_message("assistant"):
+            with st.chat_message("assistant", avatar="💬"):
                 agent = msg.get("agent", "")
                 label = AGENT_LABELS.get(agent, "🪴 Assistant")
                 st.caption(f"*Agent actif : {label}*")
@@ -284,7 +284,7 @@ else:
             "content": user_input
         })
 
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="💬"):
             with st.spinner("⏳ Traitement en cours..."):
                 try:
                     result = graph.invoke(
