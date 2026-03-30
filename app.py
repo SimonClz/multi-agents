@@ -179,15 +179,28 @@ else:
     try:
         current_state = graph.get_state(config)
         vals = current_state.values
+        assessment_state = vals.get("assessment_state", {})
+        assessment_phase = assessment_state.get("phase_name", "-")
+        optional_module = assessment_state.get("current_optional_module", "")
+        optional_queue = assessment_state.get("optional_modules_queue", [])
+        completed_optional = assessment_state.get("completed_optional_modules", [])
+
         session_count   = vals.get("session_count", 0)
         assessment_done = vals.get("assessment_done", False)
         nb_messages     = len(vals.get("messages", []))
         assessment_status = "✅ Complété" if assessment_done else "⏳ En cours"
+
     except:
-        session_count     = 0
-        assessment_done   = False
-        nb_messages       = 0
+        session_count = 0
+        assessment_done = False
+        nb_messages = 0
         assessment_status = "⏳ À démarrer"
+
+        assessment_phase = "-"
+        optional_module = ""
+        optional_queue = []
+        completed_optional = []
+
 
     # --- Sidebar ---
     with st.sidebar:
@@ -218,6 +231,16 @@ else:
         st.caption(f"🗂 Assessment : {assessment_status}")
         st.caption(f"💬 Sessions : {session_count}")
         st.caption(f"📝 Messages échangés : {nb_messages}")
+
+        st.caption(f"🧭 Phase assessment : {assessment_phase}")
+        if optional_module:
+            st.caption(f"📦 Module actif : {optional_module}")
+
+        if optional_queue:
+            st.caption(f"🗂 Modules détectés : {', '.join(optional_queue)}")
+
+        if completed_optional:
+            st.caption(f"✅ Modules faits : {', '.join(completed_optional)}")
 
 
     # --- Header ---
